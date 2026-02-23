@@ -13,7 +13,7 @@
         .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .lang-transition { transition: all 0.3s ease; }
+        .lang-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
@@ -66,8 +66,8 @@
             </div>
 
             <div class="glass-card p-6 md:p-8 rounded-3xl mt-12 border-t-4 border-sky-500/50">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div class="text-center md:text-left">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+                    <div>
                         <h3 id="ui-contactTitle" class="text-2xl font-bold text-white mb-2">有任何問題嗎？</h3>
                         <p id="ui-contactSub" class="text-slate-400 text-sm">歡迎透過 Email 與我交流學術想法！</p>
                     </div>
@@ -115,20 +115,37 @@
         function setLanguage(lang) {
             currentLang = lang;
             const t = translations[lang];
+            
+            // 更新 UI 文字內容
             document.title = t.title;
             document.getElementById('ui-header').innerText = t.header;
             document.getElementById('ui-subHeader').innerText = t.subHeader;
             document.getElementById('ui-inputLabel').innerText = t.inputLabel;
             document.getElementById('userInput').placeholder = t.placeholder;
-            document.getElementById('ui-btnText').innerText = t.btnText;
             document.getElementById('ui-indicator').innerText = t.indicator;
             document.getElementById('ui-contactTitle').innerText = t.contactTitle;
             document.getElementById('ui-contactSub').innerText = t.contactSub;
             document.getElementById('ui-privacy').innerText = t.privacy;
             document.getElementById('apiKey').placeholder = t.apiKeyPlaceholder;
+            
+            // 強制重刷按鈕文字，解決查詢後切換語言失效的問題
+            document.getElementById('ui-btnText').innerText = t.btnText;
 
-            document.getElementById('lang-zh').className = lang === 'zh' ? 'lang-transition text-sky-400 font-bold' : 'lang-transition text-slate-500 hover:text-slate-300';
-            document.getElementById('lang-en').className = lang === 'en' ? 'text-sky-400 font-bold' : 'lang-transition text-slate-500 hover:text-slate-300';
+            // 切換醒目色彩邏輯 (使用 classList 確保 100% 準確)
+            const zhBtn = document.getElementById('lang-zh');
+            const enBtn = document.getElementById('lang-en');
+
+            if (lang === 'zh') {
+                zhBtn.classList.add('text-sky-400', 'font-bold');
+                zhBtn.classList.remove('text-slate-500', 'hover:text-slate-300');
+                enBtn.classList.add('text-slate-500', 'hover:text-slate-300');
+                enBtn.classList.remove('text-sky-400', 'font-bold');
+            } else {
+                enBtn.classList.add('text-sky-400', 'font-bold');
+                enBtn.classList.remove('text-slate-500', 'hover:text-slate-300');
+                zhBtn.classList.add('text-slate-500', 'hover:text-slate-300');
+                zhBtn.classList.remove('text-sky-400', 'font-bold');
+            }
         }
 
         async function generate() {
@@ -142,7 +159,7 @@
             if(!userInput) return alert(currentLang === 'zh' ? '請輸入研究想法' : 'Please enter research ideas');
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch animate-spin"></i> ${currentLang === 'zh' ? '分析中...' : 'Analyzing...'}`;
+            btn.innerHTML = `<i class="fas fa-circle-notch animate-spin"></i> <span>${currentLang === 'zh' ? '分析中...' : 'Analyzing...'}</span>`;
             output.classList.add('hidden');
             
             const prompt = `${translations[currentLang].prompt}\n\nTopic: ${userInput}`;
@@ -159,16 +176,13 @@
             } catch (error) { alert('Error: ' + error.message); } 
             finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>${translations[currentLang].btnText}</span><i class="fas fa-wand-magic-sparkles"></i>`;
+                // 使用 span 結構，確保切換語言時能被正確抓取
+                btn.innerHTML = `<span id="ui-btnText">${translations[currentLang].btnText}</span><i class="fas fa-wand-magic-sparkles"></i>`;
             }
         }
 
         function copyResult() { navigator.clipboard.writeText(document.getElementById('resultText').innerText).then(() => alert('Copied!')); }
-        
-        function copyEmail() {
-            // Email 已確認為 yi29243@gmail.com
-            navigator.clipboard.writeText('yi29243@gmail.com').then(() => alert('Email Copied!'));
-        }
+        function copyEmail() { navigator.clipboard.writeText('yi29243@gmail.com').then(() => alert('Email Copied!')); }
     </script>
 </body>
 </html>
