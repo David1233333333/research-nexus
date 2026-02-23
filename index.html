@@ -3,32 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResearchNexus AI</title>
+    <title>ResearchNexus AI | 學術研究助理</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #0f172a; 
-            color: #f8fafc;
-            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
-        }
-        .glass-card { 
-            background: rgba(30, 41, 59, 0.7); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-        }
-        .gradient-text { 
-            background: linear-gradient(90deg, #38bdf8, #818cf8); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; background-image: radial-gradient(circle at top right, #1e293b, #0f172a); }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* 語系切換過渡動畫 */
-        .lang-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .lang-transition { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
@@ -40,39 +25,34 @@
             <button id="lang-en" onclick="setLanguage('en')" class="lang-transition text-slate-500 hover:text-slate-300">English</button>
         </div>
 
-        <header class="mb-10 text-center">
-            <h1 id="ui-header" class="text-5xl font-bold mb-3 gradient-text italic">ResearchNexus AI</h1>
-            <p id="ui-subHeader" class="text-slate-400 text-lg">專為學術研究打造的 AI 思路建構工具</p>
+        <header class="mb-8 md:mb-10 text-center">
+            <h1 id="ui-header" class="text-4xl md:text-5xl font-bold mb-3 gradient-text italic px-4 break-words">ResearchNexus AI</h1>
+            <p id="ui-subHeader" class="text-slate-400 text-base md:text-lg px-4">專為學術研究打造的 AI 思路建構工具</p>
         </header>
 
         <div class="glass-card p-6 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
             <div class="flex items-center gap-3 w-full">
                 <div class="bg-sky-500/10 p-2 rounded-lg"><i class="fas fa-key text-sky-400"></i></div>
                 <input type="password" id="apiKey" placeholder="在此輸入您的 Gemini API Key..." 
-                       class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm transition-all">
+                       class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
             </div>
             <a href="https://aistudio.google.com/app/api-keys" target="_blank" class="whitespace-nowrap text-sm text-sky-400 hover:underline">Get Key</a>
         </div>
 
         <div class="space-y-6">
-            <div class="glass-card p-8 rounded-3xl shadow-2xl">
+            <div class="glass-card p-6 md:p-8 rounded-3xl shadow-2xl">
                 <div class="flex items-center gap-2 mb-4 text-sky-400">
                     <i class="fas fa-microscope"></i>
                     <label id="ui-inputLabel" class="text-sm font-semibold uppercase tracking-wider">研究主題與假設生成</label>
                 </div>
-                
-                <textarea id="userInput" rows="6" 
-                          class="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none text-slate-200 leading-relaxed transition-all"
-                          placeholder="例如：探討 YOLO 模型在自動化產線中的行為偵測應用..."></textarea>
-                
-                <button onclick="generate()" id="genBtn" 
-                        class="mt-6 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center gap-3 active:scale-95 shadow-lg shadow-sky-900/20">
+                <textarea id="userInput" rows="6" class="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none text-slate-200 leading-relaxed" placeholder="例如：探討 YOLO 模型在自動化產線中的行為偵測應用..."></textarea>
+                <button onclick="generate()" id="genBtn" class="mt-6 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center gap-3 active:scale-95 shadow-lg shadow-sky-900/20">
                     <span id="ui-btnText">啟動學術分析報告</span>
                     <i class="fas fa-wand-magic-sparkles"></i>
                 </button>
             </div>
 
-            <div id="outputContainer" class="hidden glass-card p-8 rounded-3xl animate-fade-in shadow-2xl">
+            <div id="outputContainer" class="hidden glass-card p-6 md:p-8 rounded-3xl animate-fade-in shadow-2xl">
                 <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
@@ -85,9 +65,9 @@
                 <div id="resultText" class="text-slate-200 whitespace-pre-line leading-loose text-base"></div>
             </div>
 
-            <div class="glass-card p-8 rounded-3xl mt-12 border-t-4 border-sky-500/50 animate-fade-in">
+            <div class="glass-card p-6 md:p-8 rounded-3xl mt-12 border-t-4 border-sky-500/50">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div>
+                    <div class="text-center md:text-left">
                         <h3 id="ui-contactTitle" class="text-2xl font-bold text-white mb-2">有任何問題嗎？</h3>
                         <p id="ui-contactSub" class="text-slate-400 text-sm">歡迎透過 Email 與我交流學術想法！</p>
                     </div>
@@ -111,46 +91,30 @@
     </div>
 
     <script>
-        // 語系字典：包含 Placeholder 更新
         const translations = {
             zh: {
-                title: "ResearchNexus AI | 學術研究助理",
-                header: "ResearchNexus AI",
-                subHeader: "專為學術研究打造的 AI 思路建構工具",
-                apiKeyPlaceholder: "在此輸入您的 Gemini API Key...",
-                inputLabel: "研究主題與假設生成",
-                placeholder: "例如：探討 YOLO 模型在自動化產線中的行為偵測應用...",
-                btnText: "啟動學術分析報告",
-                indicator: "Gemini 2.5 Flash 分析報告",
-                contactTitle: "有任何問題嗎？",
-                contactSub: "歡迎透過 Email 與我交流學術想法！",
-                privacy: "隱私聲明：本工具不儲存任何金鑰與輸入內容",
+                title: "ResearchNexus AI | 學術研究助理", header: "ResearchNexus AI", subHeader: "專為學術研究打造的 AI 思路建構工具",
+                apiKeyPlaceholder: "在此輸入您的 Gemini API Key...", inputLabel: "研究主題與假設生成",
+                placeholder: "例如：探討 YOLO 模型在自動化產線中的行為偵測應用...", btnText: "啟動學術分析報告",
+                indicator: "Gemini 2.5 Flash 分析報告", contactTitle: "有任何問題嗎？",
+                contactSub: "歡迎透過 Email 與我交流學術想法！", privacy: "隱私聲明：本工具不儲存任何金鑰與輸入內容",
                 prompt: "你是一位資深的學術論文指導教授。請針對以下主題提供研究背景、三個研究假設與實驗方法建議。請使用繁體中文，格式清晰。"
             },
             en: {
-                title: "ResearchNexus AI | Academic Assistant",
-                header: "ResearchNexus AI",
-                subHeader: "AI-Powered Research Framework Generator",
-                apiKeyPlaceholder: "Enter your Gemini API Key here...",
-                inputLabel: "Research Topic & Hypothesis Generation",
-                placeholder: "e.g., Exploring YOLO model for behavior detection in automated assembly lines...",
-                btnText: "Generate Research Report",
-                indicator: "Gemini 2.5 Flash Analysis Report",
-                contactTitle: "Any Questions?",
-                contactSub: "Feel free to contact me via email for collaboration!",
-                privacy: "Privacy Note: API keys and input content are not stored.",
-                prompt: "You are a senior research professor. Please provide research background, three challenging hypotheses, and experimental methodology for the following topic. Please respond in English with clear formatting."
+                title: "ResearchNexus AI | Academic Assistant", header: "ResearchNexus AI", subHeader: "AI-Powered Research Framework Generator",
+                apiKeyPlaceholder: "Enter your Gemini API Key here...", inputLabel: "Research Topic & Hypothesis Generation",
+                placeholder: "e.g., Exploring YOLO model for behavior detection...", btnText: "Generate Research Report",
+                indicator: "Gemini 2.5 Flash Analysis Report", contactTitle: "Any Questions?",
+                contactSub: "Feel free to contact me via email for collaboration!", privacy: "Privacy Note: API keys are not stored.",
+                prompt: "You are a senior research professor. Please provide research background, three challenging hypotheses, and experimental methodology for the following topic. Please respond in English."
             }
         };
 
         let currentLang = 'zh';
 
-        // 核心切換函數：修正視覺醒目色彩與 Placeholder
         function setLanguage(lang) {
             currentLang = lang;
             const t = translations[lang];
-            
-            // 更新 UI 文字
             document.title = t.title;
             document.getElementById('ui-header').innerText = t.header;
             document.getElementById('ui-subHeader').innerText = t.subHeader;
@@ -161,21 +125,10 @@
             document.getElementById('ui-contactTitle').innerText = t.contactTitle;
             document.getElementById('ui-contactSub').innerText = t.contactSub;
             document.getElementById('ui-privacy').innerText = t.privacy;
-
-            // 修正點：更新 API Key 輸入框的提示文字
             document.getElementById('apiKey').placeholder = t.apiKeyPlaceholder;
 
-            // 修正點：更新按鈕顏色 (Active State)
-            const zhBtn = document.getElementById('lang-zh');
-            const enBtn = document.getElementById('lang-en');
-
-            if (lang === 'zh') {
-                zhBtn.className = 'lang-transition text-sky-400 font-bold';
-                enBtn.className = 'lang-transition text-slate-500 hover:text-slate-300';
-            } else {
-                enBtn.className = 'lang-transition text-sky-400 font-bold';
-                zhBtn.className = 'lang-transition text-slate-500 hover:text-slate-300';
-            }
+            document.getElementById('lang-zh').className = lang === 'zh' ? 'lang-transition text-sky-400 font-bold' : 'lang-transition text-slate-500 hover:text-slate-300';
+            document.getElementById('lang-en').className = lang === 'en' ? 'text-sky-400 font-bold' : 'lang-transition text-slate-500 hover:text-slate-300';
         }
 
         async function generate() {
@@ -189,43 +142,31 @@
             if(!userInput) return alert(currentLang === 'zh' ? '請輸入研究想法' : 'Please enter research ideas');
 
             btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch animate-spin"></i> ${currentLang === 'zh' ? '正在分析...' : 'Analyzing...'}`;
+            btn.innerHTML = `<i class="fas fa-circle-notch animate-spin"></i> ${currentLang === 'zh' ? '分析中...' : 'Analyzing...'}`;
             output.classList.add('hidden');
             
             const prompt = `${translations[currentLang].prompt}\n\nTopic: ${userInput}`;
-            
-            // 鎖定 Gemini 2.5 Flash 路徑
             const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
             try {
-                const response = await fetch(targetUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-
+                const response = await fetch(targetUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
                 const data = await response.json();
                 if (response.ok && data.candidates) {
                     resultText.innerText = data.candidates[0].content.parts[0].text;
                     output.classList.remove('hidden');
                     window.scrollTo({ top: output.offsetTop - 50, behavior: 'smooth' });
-                } else {
-                    throw new Error(data.error ? data.error.message : 'API Request Failed');
-                }
-            } catch (error) {
-                alert('Error: ' + error.message);
-            } finally {
+                } else { throw new Error(data.error ? data.error.message : 'API Error'); }
+            } catch (error) { alert('Error: ' + error.message); } 
+            finally {
                 btn.disabled = false;
                 btn.innerHTML = `<span>${translations[currentLang].btnText}</span><i class="fas fa-wand-magic-sparkles"></i>`;
             }
         }
 
-        function copyResult() {
-            navigator.clipboard.writeText(document.getElementById('resultText').innerText).then(() => alert('Copied!'));
-        }
-
+        function copyResult() { navigator.clipboard.writeText(document.getElementById('resultText').innerText).then(() => alert('Copied!')); }
+        
         function copyEmail() {
-            // 替換為你的真實 Email
+            // Email 已確認為 yi29243@gmail.com
             navigator.clipboard.writeText('yi29243@gmail.com').then(() => alert('Email Copied!'));
         }
     </script>
