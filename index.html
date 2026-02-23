@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResearchNexus AI | 學術研究助理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0f172a; 
+            color: #f8fafc;
+            background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+        }
+        .glass-card { 
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+        .gradient-text { 
+            background: linear-gradient(90deg, #38bdf8, #818cf8); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+
+    <div class="max-w-4xl w-full">
+        <header class="mb-10 text-center">
+            <h1 class="text-5xl font-bold mb-3 gradient-text italic">ResearchNexus AI</h1>
+            <p class="text-slate-400 text-lg">專為學術研究打造的 AI 思路建構工具</p>
+        </header>
+
+        <div class="glass-card p-6 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
+            <div class="flex items-center gap-3 w-full">
+                <div class="bg-sky-500/10 p-2 rounded-lg"><i class="fas fa-key text-sky-400"></i></div>
+                <input type="password" id="apiKey" placeholder="在此輸入您的 Gemini API Key..." 
+                       class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+            </div>
+            <a href="https://aistudio.google.com/app/api-keys" target="_blank" 
+               class="whitespace-nowrap text-sm text-sky-400 hover:underline">獲取 API Key</a>
+        </div>
+
+        <div class="space-y-6">
+            <div class="glass-card p-8 rounded-3xl shadow-2xl">
+                <div class="flex items-center gap-2 mb-4 text-sky-400">
+                    <i class="fas fa-microscope"></i>
+                    <label class="text-sm font-semibold uppercase tracking-wider">研究主題與假設生成</label>
+                </div>
+                
+                <textarea id="userInput" rows="6" 
+                          class="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none text-slate-200 leading-relaxed"
+                          placeholder="請輸入您的研究想法，例如：探討 YOLO 模型在自動化產線中的行為偵測應用..."></textarea>
+                
+                <button onclick="generate()" id="genBtn" 
+                        class="mt-6 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl transition-all transform active:scale-95 flex justify-center items-center gap-3">
+                    <span id="btnText">啟動學術分析報告</span>
+                    <i class="fas fa-wand-magic-sparkles"></i>
+                </button>
+            </div>
+
+            <div id="outputContainer" class="hidden glass-card p-8 rounded-3xl animate-fade-in shadow-2xl">
+                <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-sky-400 italic">Gemini 2.5 Flash 分析報告</span>
+                    </div>
+                    <button onclick="copyResult()" class="text-slate-400 hover:text-sky-400 transition flex items-center gap-2 text-sm">
+                        <i class="fas fa-copy"></i> 複製內容
+                    </button>
+                </div>
+                <div id="resultText" class="text-slate-200 whitespace-pre-line leading-loose text-base">
+                    </div>
+            </div>
+        </div>
+
+        <footer class="mt-16 text-center text-slate-500 text-sm">
+            <p>© 2026 ResearchNexus AI • 以學術專業為核心的 AI 助手</p>
+            <p class="mt-2 text-xs">隱私聲明：本工具不儲存任何金鑰與輸入內容</p>
+        </footer>
+    </div>
+
+    <script>
+        async function generate() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            const userInput = document.getElementById('userInput').value.trim();
+            const btn = document.getElementById('genBtn');
+            const output = document.getElementById('outputContainer');
+            const resultText = document.getElementById('resultText');
+
+            if(!apiKey) return alert('請先輸入 API Key');
+            if(!userInput) return alert('請先輸入一些研究主題的想法');
+
+            // UI 更新
+            btn.disabled = true;
+            btn.classList.add('opacity-70');
+            btn.innerHTML = '<i class="fas fa-circle-notch animate-spin"></i> 正在架構學術思維...';
+            output.classList.add('hidden');
+            
+            // 針對學術研究優化的 Prompt
+            const prompt = `你是一位資深的學術論文指導教授。請針對以下主題描述：「${userInput}」，產出一份專業的研究提案建議：
+            1. 研究背景與現狀簡述
+            2. 三個具備挑戰性且可驗證的研究假設 (Research Hypotheses)
+            3. 建議採用的實驗方法論或技術路徑
+            請使用繁體中文，口吻專業、嚴謹，並使用清晰的標題格式。`;
+
+            // 使用你測試成功的路徑與模型
+            const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(targetUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }]
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.candidates) {
+                    resultText.innerText = data.candidates[0].content.parts[0].text;
+                    output.classList.remove('hidden');
+                    window.scrollTo({ top: output.offsetTop - 50, behavior: 'smooth' });
+                } else {
+                    throw new Error(data.error ? data.error.message : 'API 請求失敗');
+                }
+
+            } catch (error) {
+                console.error("API Error:", error);
+                alert('分析出錯了：' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70');
+                btn.innerHTML = '<span>啟動學術分析報告</span><i class="fas fa-wand-magic-sparkles"></i>';
+            }
+        }
+
+        function copyResult() {
+            const text = document.getElementById('resultText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('分析報告已複製！');
+            });
+        }
+    </script>
+</body>
+</html>
