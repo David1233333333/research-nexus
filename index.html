@@ -8,75 +8,148 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; background-image: radial-gradient(circle at top right, #1e293b, #0f172a); }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .gradient-text { background: linear-gradient(90deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .lang-transition { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #020617; 
+            color: #f8fafc; 
+            background-image: 
+                radial-gradient(circle at top right, rgba(30, 41, 59, 1), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(15, 23, 42, 1), transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .glass-card { 
+            background: rgba(15, 23, 42, 0.65); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card-glow {
+            position: relative;
+        }
+        .glass-card-glow::before {
+            content: ""; position: absolute; inset: 0; border-radius: inherit;
+            padding: 1px; background: linear-gradient(to bottom, rgba(56, 189, 248, 0.2), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude; pointer-events: none;
+        }
+
+        .gradient-text { 
+            background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            letter-spacing: -0.02em;
+        }
+
+        .btn-glow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-glow:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px -10px rgba(56, 189, 248, 0.5);
+            filter: brightness(1.1);
+        }
+        .btn-glow:active { transform: scale(0.98); }
+
+        /* 模式按鈕切換樣式 */
+        .mode-btn { transition: all 0.3s ease; border: 1px solid rgba(56, 189, 248, 0.1); }
+        .mode-btn.active { 
+            background: rgba(56, 189, 248, 0.15); 
+            border-color: rgba(56, 189, 248, 0.5); 
+            color: #38bdf8;
+            box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
+        }
+
+        .animate-fade-in { animation: fadeIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .lang-transition { transition: all 0.3s ease; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 flex flex-col items-center">
+<body class="min-h-screen p-4 md:p-12 flex flex-col items-center">
 
-    <div class="max-w-4xl w-full">
-        <div class="flex justify-end gap-4 mb-4 text-sm px-2">
-            <button id="lang-zh" onclick="setLanguage('zh')" class="lang-transition text-sky-400 font-bold">繁體中文</button>
-            <span class="text-slate-700">|</span>
-            <button id="lang-en" onclick="setLanguage('en')" class="lang-transition text-slate-500 hover:text-slate-300">English</button>
+    <div class="max-w-4xl w-full space-y-10">
+        <div class="flex justify-end items-center gap-4 mb-2 text-xs font-semibold tracking-widest px-2 uppercase">
+            <button id="lang-zh" onclick="setLanguage('zh')" class="lang-transition text-sky-400 font-bold hover:text-sky-300">繁體中文</button>
+            <span class="text-slate-800">/</span>
+            <button id="lang-en" onclick="setLanguage('en')" class="lang-transition text-slate-600 hover:text-slate-300">English</button>
         </div>
 
-        <header class="mb-8 md:mb-10 text-center">
-            <h1 id="ui-header" class="text-4xl md:text-5xl font-bold mb-3 gradient-text italic px-4 break-words">ResearchNexus AI</h1>
-            <p id="ui-subHeader" class="text-slate-400 text-base md:text-lg px-4">專為學術研究打造的 AI 思路建構工具</p>
+        <header class="text-center space-y-4">
+            <h1 id="ui-header" class="text-5xl md:text-6xl font-bold gradient-text italic px-4">ResearchNexus AI</h1>
+            <p id="ui-subHeader" class="text-slate-400 text-base md:text-lg px-4 max-w-2xl mx-auto font-light tracking-wide">專為學術研究打造的 AI 思路建構工具</p>
         </header>
 
-        <div class="glass-card p-6 rounded-2xl mb-8 flex flex-col md:flex-row items-center gap-4">
-            <div class="flex items-center gap-3 w-full">
-                <div class="bg-sky-500/10 p-2 rounded-lg"><i class="fas fa-key text-sky-400"></i></div>
-                <input type="password" id="apiKey" placeholder="在此輸入您的 Gemini API Key..." 
-                       class="bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm">
+        <div class="glass-card glass-card-glow p-6 rounded-3xl space-y-4">
+            <div class="flex flex-col md:flex-row items-center gap-5">
+                <div class="flex items-center gap-4 w-full group">
+                    <div class="bg-sky-500/10 p-3 rounded-2xl group-focus-within:bg-sky-500/20 transition-colors">
+                        <i class="fas fa-key text-sky-400"></i>
+                    </div>
+                    <input type="password" id="apiKey" placeholder="在此輸入您的 Gemini API Key..." 
+                           class="bg-transparent border-b border-slate-700 w-full py-2 focus:outline-none focus:border-sky-500 transition-all text-sm tracking-widest placeholder:text-slate-600">
+                </div>
+                <a href="https://aistudio.google.com/app/api-keys" target="_blank" 
+                   class="whitespace-nowrap flex-shrink-0 text-xs font-bold text-sky-400 hover:text-white bg-sky-500/10 hover:bg-sky-500 px-5 py-2.5 rounded-full transition-all border border-sky-500/20 uppercase tracking-tighter">Get Key</a>
             </div>
-            <a href="https://aistudio.google.com/app/api-keys" target="_blank" class="whitespace-nowrap text-sm text-sky-400 hover:underline">Get Key</a>
+            <div class="flex flex-col gap-2 pl-2">
+                <div class="text-[13px] text-emerald-400 font-mono flex items-center gap-2 tracking-tight">
+                    <i class="fas fa-bolt-lightning"></i>
+                    <span id="ui-quotaHint">已最佳化：使用 Gemma 3 27B 高配額模型 (14.4K/日)</span>
+                </div>
+                <div id="ui-noStoreHint" class="text-[12px] text-slate-500 italic">本工具不會儲存您的 API Key，僅供當前對話呼叫使用。</div>
+            </div>
         </div>
 
-        <div class="space-y-6">
-            <div class="glass-card p-6 md:p-8 rounded-3xl shadow-2xl">
-                <div class="flex items-center gap-2 mb-4 text-sky-400">
-                    <i class="fas fa-microscope"></i>
-                    <label id="ui-inputLabel" class="text-sm font-semibold uppercase tracking-wider">研究主題與假設生成</label>
+        <div class="space-y-4">
+            <div class="flex flex-wrap gap-3 px-2">
+                <button onclick="setMode('standard')" id="mode-standard" class="mode-btn active glass-card px-4 py-2 rounded-xl text-[13px] font-bold uppercase tracking-widest">核心分析</button>
+                <button onclick="setMode('icebreaker')" id="mode-icebreaker" class="mode-btn glass-card px-4 py-2 rounded-xl text-[13px] font-bold uppercase tracking-widest">研究破冰</button>
+                <button onclick="setMode('stress')" id="mode-stress" class="mode-btn glass-card px-4 py-2 rounded-xl text-[13px] font-bold uppercase tracking-widest">壓力測試</button>
+            </div>
+            <div id="ui-modeDesc" class="px-4 text-[14px] text-slate-500 italic border-l-2 border-sky-500/30 py-1 ml-2">💡 模式：資深教授。產出完整背景分析、假設與實驗建議。</div>
+        </div>
+
+        <div class="space-y-8">
+            <div class="glass-card glass-card-glow p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                <div class="flex items-center gap-3 mb-6 text-sky-400/80">
+                    <i class="fas fa-microscope text-xs"></i>
+                    <label id="ui-inputLabel" class="text-xs font-bold uppercase tracking-[0.2em]">研究主題與假設生成</label>
                 </div>
-                <textarea id="userInput" rows="6" class="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-5 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none text-slate-200 leading-relaxed" placeholder="例如：探討 YOLO 模型在自動化產線中的行為偵測應用..."></textarea>
-                <button onclick="generate()" id="genBtn" class="mt-6 w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex justify-center items-center gap-3 active:scale-95 shadow-lg shadow-sky-900/20">
-                    <span id="ui-btnText">啟動學術分析報告</span>
+                <textarea id="userInput" rows="6" class="w-full bg-slate-900/30 border border-slate-800/50 rounded-2xl p-6 focus:outline-none focus:ring-2 focus:ring-sky-500/30 resize-none text-slate-200 leading-relaxed text-base placeholder:text-slate-700" placeholder="例如：探討 YOLO 模型在自動化產線中的行為偵測應用..."></textarea>
+                <button onclick="generate()" id="genBtn" class="btn-glow mt-8 w-full bg-gradient-to-br from-sky-500 to-indigo-600 text-white font-bold py-5 rounded-2xl transition-all flex justify-center items-center gap-3 shadow-lg shadow-sky-900/20">
+                    <span id="ui-btnText" class="tracking-widest uppercase text-sm">啟動學術分析報告</span>
                     <i class="fas fa-wand-magic-sparkles"></i>
                 </button>
             </div>
 
-            <div id="outputContainer" class="hidden glass-card p-6 md:p-8 rounded-3xl animate-fade-in shadow-2xl">
-                <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
-                    <div class="flex items-center gap-2">
+            <div id="outputContainer" class="hidden glass-card p-8 md:p-12 rounded-[2.5rem] animate-fade-in">
+                <div class="flex justify-between items-center mb-8 border-b border-slate-800/50 pb-6">
+                    <div class="flex items-center gap-3">
                         <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-                        <span id="ui-indicator" class="text-xs font-bold uppercase tracking-widest text-sky-400 italic">Gemini 2.5 Flash 分析報告</span>
+                        <span id="ui-indicator" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-400">Gemma 3 分析報告</span>
                     </div>
-                    <button onclick="copyResult()" class="text-slate-400 hover:text-sky-400 transition flex items-center gap-2 text-sm">
+                    <button onclick="copyResult()" class="text-slate-500 hover:text-sky-400 transition-all p-2 hover:bg-sky-500/10 rounded-lg">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
-                <div id="resultText" class="text-slate-200 whitespace-pre-line leading-loose text-base"></div>
+                <div id="resultText" class="text-slate-300 whitespace-pre-line leading-[2] text-base font-light italic"></div>
             </div>
 
-            <div class="glass-card p-6 md:p-8 rounded-3xl mt-12 border-t-4 border-sky-500/50">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
-                    <div>
-                        <h3 id="ui-contactTitle" class="text-2xl font-bold text-white mb-2">有任何問題嗎？</h3>
-                        <p id="ui-contactSub" class="text-slate-400 text-sm">歡迎透過 Email 與我交流學術想法！</p>
+            <div class="glass-card glass-card-glow p-8 rounded-[2rem] border-t border-sky-500/20">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div class="text-center md:text-left">
+                        <h3 id="ui-contactTitle" class="text-xl font-bold text-white mb-1">有任何問題嗎？</h3>
+                        <p id="ui-contactSub" class="text-slate-500 text-sm font-light">歡迎透過 Email 與我交流學術想法！</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <a href="mailto:yi29243@gmail.com" class="bg-white/10 hover:bg-white/20 text-white px-5 py-3 rounded-xl transition-all flex items-center gap-2 border border-white/10 text-sm">
+                    <div class="flex items-center gap-4">
+                        <a href="mailto:yi29243@gmail.com" class="btn-glow bg-white/5 hover:bg-white/10 text-white px-6 py-3 rounded-xl transition-all flex items-center gap-3 border border-white/10 text-sm">
                             <i class="fas fa-envelope text-sky-400"></i>
-                            <span>Email Me</span>
+                            <span class="font-semibold">Email Me</span>
                         </a>
-                        <button onclick="copyEmail()" class="bg-sky-600 hover:bg-sky-500 text-white p-3 rounded-xl transition-all">
+                        <button onclick="copyEmail()" class="btn-glow bg-sky-600 hover:bg-sky-500 text-white p-3.5 rounded-xl transition-all">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -84,68 +157,102 @@
             </div>
         </div>
 
-        <footer class="mt-16 text-center text-slate-500 text-sm">
-            <p>© 2026 ResearchNexus AI • All Rights Reserved</p>
-            <p id="ui-privacy" class="mt-2 text-xs">隱私聲明：本工具不儲存任何金鑰與輸入內容</p>
+        <footer class="mt-20 text-center text-slate-400 space-y-4 pb-12">
+            <p class="text-xs uppercase tracking-widest font-medium">© 2026 ResearchNexus AI • Developed by David Huang</p>
+            <p id="ui-privacy" class="text-xs italic opacity-80">隱私聲明：本工具不儲存任何金鑰與輸入內容</p>
         </footer>
     </div>
 
     <script>
+        /* 邏輯核心擴充：新增角色模式連動 */
         const translations = {
             zh: {
                 title: "ResearchNexus AI | 學術研究助理", header: "ResearchNexus AI", subHeader: "專為學術研究打造的 AI 思路建構工具",
                 apiKeyPlaceholder: "在此輸入您的 Gemini API Key...", inputLabel: "研究主題與假設生成",
                 placeholder: "例如：探討 YOLO 模型在自動化產線中的行為偵測應用...", btnText: "啟動學術分析報告",
-                indicator: "Gemini 2.5 Flash 分析報告", contactTitle: "有任何問題嗎？",
-                contactSub: "歡迎透過 Email 與我交流學術想法！", privacy: "隱私聲明：本工具不儲存任何金鑰與輸入內容",
-                prompt: "你是一位資深的學術論文指導教授。請針對以下主題提供研究背景、三個研究假設與實驗方法建議。請使用繁體中文，格式清晰。"
+                indicator: "Gemma 3 分析報告", quotaHint: "已最佳化：使用 Gemma 3 27B 高配額模型 (14.4K/日)",
+                noStoreHint: "本工具不會儲存您的 API Key，僅供當前對話呼叫使用。",
+                contactTitle: "有任何問題嗎？", contactSub: "歡迎透過 Email 與我交流學術想法！", 
+                privacy: "隱私聲明：本工具不儲存任何金鑰與輸入內容",
+                modesText: { standard: "核心分析", icebreaker: "研究破冰", stress: "壓力測試" },
+                modesDesc: {
+                    standard: "💡 模式：資深教授。產出完整背景分析、假設與實驗建議。",
+                    icebreaker: "🌱 模式：靈感導師。將複雜構思拆解為白話文，提供低門檻切入點。",
+                    stress: "⚖️ 模式：嚴苛審稿人。針對邏輯挑錯與實驗缺陷提供強硬建議。"
+                },
+                aiPrompts: {
+                    standard: "你是一位資深的學術論文指導教授。請針對以下主題提供研究背景、三個研究假設與實驗方法建議。請使用繁體中文，格式清晰。",
+                    icebreaker: "你是一位擅長啟發靈感的導師。請將以下複雜的學術主題拆解成白話，提出兩個簡單入門方向與潛在技術難點。請使用繁體中文。",
+                    stress: "你是一位極其嚴苛的學術審稿人（Reviewer）。請針對以下研究主題找出三個潛在的邏輯漏洞或實驗設計缺陷，並提出具體的補救建議。請使用繁體中文。"
+                }
             },
             en: {
                 title: "ResearchNexus AI | Academic Assistant", header: "ResearchNexus AI", subHeader: "AI-Powered Research Framework Generator",
                 apiKeyPlaceholder: "Enter your Gemini API Key here...", inputLabel: "Research Topic & Hypothesis Generation",
                 placeholder: "e.g., Exploring YOLO model for behavior detection...", btnText: "Generate Research Report",
-                indicator: "Gemini 2.5 Flash Analysis Report", contactTitle: "Any Questions?",
-                contactSub: "Feel free to contact me via email for collaboration!", privacy: "Privacy Note: API keys are not stored.",
-                prompt: "You are a senior research professor. Please provide research background, three challenging hypotheses, and experimental methodology for the following topic. Please respond in English."
+                indicator: "Gemma 3 Analysis Report", quotaHint: "Optimized: Using Gemma 3 27B (14.4K Quota/Day)",
+                noStoreHint: "Your API Key is not stored and is used only for current calls.",
+                contactTitle: "Any Questions?", contactSub: "Feel free to contact me via email for collaboration!", 
+                privacy: "Privacy Note: API keys are not stored.",
+                modesText: { standard: "Core Analysis", icebreaker: "Icebreaker", stress: "Stress Test" },
+                modesDesc: {
+                    standard: "💡 Role: Senior Professor. Background, hypotheses, and methodology.",
+                    icebreaker: "🌱 Role: Mentor. Simplifying complex ideas into entry points.",
+                    stress: "⚖️ Role: Reviewer. Identifying flaws and suggesting fixes."
+                },
+                aiPrompts: {
+                    standard: "You are a senior research professor. Please provide research background, three challenging hypotheses, and experimental methodology for the following topic. Please respond in English.",
+                    icebreaker: "You are an inspiring mentor. Please simplify the following complex topic into layman terms, suggest two entry points and technical challenges. Please respond in English.",
+                    stress: "You are a rigorous peer reviewer. Please identify three potential logical flaws or design defects for the following topic and suggest remedies. Please respond in English."
+                }
             }
         };
 
         let currentLang = 'zh';
+        let currentMode = 'standard'; // 預設角色
 
         function setLanguage(lang) {
             currentLang = lang;
             const t = translations[lang];
-            
-            // 更新 UI 文字內容
             document.title = t.title;
             document.getElementById('ui-header').innerText = t.header;
             document.getElementById('ui-subHeader').innerText = t.subHeader;
             document.getElementById('ui-inputLabel').innerText = t.inputLabel;
             document.getElementById('userInput').placeholder = t.placeholder;
             document.getElementById('ui-indicator').innerText = t.indicator;
+            document.getElementById('ui-quotaHint').innerText = t.quotaHint;
+            document.getElementById('ui-noStoreHint').innerText = t.noStoreHint;
             document.getElementById('ui-contactTitle').innerText = t.contactTitle;
             document.getElementById('ui-contactSub').innerText = t.contactSub;
             document.getElementById('ui-privacy').innerText = t.privacy;
             document.getElementById('apiKey').placeholder = t.apiKeyPlaceholder;
-            
-            // 強制重刷按鈕文字，解決查詢後切換語言失效的問題
             document.getElementById('ui-btnText').innerText = t.btnText;
 
-            // 切換醒目色彩邏輯 (使用 classList 確保 100% 準確)
+            // 切換語系時同步更新角色按鈕文字與當前描述
+            document.getElementById('mode-standard').innerText = t.modesText.standard;
+            document.getElementById('mode-icebreaker').innerText = t.modesText.icebreaker;
+            document.getElementById('mode-stress').innerText = t.modesText.stress;
+            document.getElementById('ui-modeDesc').innerText = t.modesDesc[currentMode];
+
             const zhBtn = document.getElementById('lang-zh');
             const enBtn = document.getElementById('lang-en');
-
             if (lang === 'zh') {
-                zhBtn.classList.add('text-sky-400', 'font-bold');
-                zhBtn.classList.remove('text-slate-500', 'hover:text-slate-300');
-                enBtn.classList.add('text-slate-500', 'hover:text-slate-300');
-                enBtn.classList.remove('text-sky-400', 'font-bold');
+                zhBtn.className = "lang-transition text-sky-400 font-bold hover:text-sky-300";
+                enBtn.className = "lang-transition text-slate-600 hover:text-slate-300";
             } else {
-                enBtn.classList.add('text-sky-400', 'font-bold');
-                enBtn.classList.remove('text-slate-500', 'hover:text-slate-300');
-                zhBtn.classList.add('text-slate-500', 'hover:text-slate-300');
-                zhBtn.classList.remove('text-sky-400', 'font-bold');
+                enBtn.className = "lang-transition text-sky-400 font-bold hover:text-sky-300";
+                zhBtn.className = "lang-transition text-slate-600 hover:text-slate-300";
             }
+        }
+
+        /* 新增：切換角色邏輯 */
+        function setMode(mode) {
+            currentMode = mode;
+            // 更新 UI 按鈕狀態
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`mode-${mode}`).classList.add('active');
+            // 更新模式描述
+            document.getElementById('ui-modeDesc').innerText = translations[currentLang].modesDesc[mode];
         }
 
         async function generate() {
@@ -162,8 +269,9 @@
             btn.innerHTML = `<i class="fas fa-circle-notch animate-spin"></i> <span>${currentLang === 'zh' ? '分析中...' : 'Analyzing...'}</span>`;
             output.classList.add('hidden');
             
-            const prompt = `${translations[currentLang].prompt}\n\nTopic: ${userInput}`;
-            const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+            // 關鍵修改：根據 currentMode 選擇 AI 指令
+            const prompt = `${translations[currentLang].aiPrompts[currentMode]}\n\nTopic: ${userInput}`;
+            const targetUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemma-3-27b-it:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(targetUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
@@ -176,7 +284,6 @@
             } catch (error) { alert('Error: ' + error.message); } 
             finally {
                 btn.disabled = false;
-                // 使用 span 結構，確保切換語言時能被正確抓取
                 btn.innerHTML = `<span id="ui-btnText">${translations[currentLang].btnText}</span><i class="fas fa-wand-magic-sparkles"></i>`;
             }
         }
