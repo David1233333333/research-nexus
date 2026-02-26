@@ -12,7 +12,9 @@
 
 ---
 
-<img src="https://github.com/user-attachments/assets/03bdc520-6eda-455d-a67c-01d9bfa9dc92" width="100%" alt="ResearchNexus AI 介面預覽">
+<a href="https://github.com/user-attachments/assets/726741be-0c0c-40cb-8f6f-d9a1a9247ee9" target="_blank">
+  <img src="https://github.com/user-attachments/assets/726741be-0c0c-40cb-8f6f-d9a1a9247ee9" width="100%" alt="ResearchNexus AI 完整預覽 (Preview)">
+</a>
 
 ---
 
